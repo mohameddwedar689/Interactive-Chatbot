@@ -38,56 +38,60 @@ for intent in data['intents']:
     if intent['tag'] not in lables:
         lables.append(intent['tag'])
 
-
-# Stemming data form words list
-words = [stemmer.stem(w.lower()) for w in words if w != '?']
-# for overfeding purposes
-words = sorted(list(set(words)))
-lables = sorted(lables)
-
-
-
-#print(words)
-#print(lables)
+try:
+    with open('data.pickle' , "rb") as f:
+        words , lables , training , output  = pickle.load(f)
+except:
+    # Stemming data form words list
+    words = [stemmer.stem(w.lower()) for w in words if w != '?']
+    # for overfeding purposes
+    words = sorted(list(set(words)))
+    lables = sorted(lables)
 
 
-# Create training list
-training = []
-output = []
 
-out_empty = [0 for _ in range(len(lables))]
-
-#print(out_empty)
+    #print(words)
+    #print(lables)
 
 
-for x , doc in enumerate(docs_x):
-    bag = []
+    # Create training list
+    training = []
+    output = []
 
-    wrds = [stemmer.stem(w) for w  in doc]
+    out_empty = [0 for _ in range(len(lables))]
 
-    #print(wrds)
-
-    for w in words:
-        if w in wrds:
-            bag.append(1)
-        else:
-            bag.append(0)
+    #print(out_empty)
 
 
-    #print(bag)
+    for x , doc in enumerate(docs_x):
+        bag = []
 
-    output_row = out_empty[:]
-    output_row[lables.index(docs_y[x])] = 1
+        wrds = [stemmer.stem(w) for w  in doc]
 
-    training.append(bag)
-    output.append(output_row)
+        #print(wrds)
 
-#print(training)
-#print(output)
- 
-# convert it to numpy array 
-training = numpy.array(training)
-output = numpy.array(output)
+        for w in words:
+            if w in wrds:
+                bag.append(1)
+            else:
+                bag.append(0)
 
 
+        #print(bag)
+
+        output_row = out_empty[:]
+        output_row[lables.index(docs_y[x])] = 1
+
+        training.append(bag)
+        output.append(output_row)
+
+    #print(training)
+    #print(output)
+    
+    # convert it to numpy array 
+    training = numpy.array(training)
+    output = numpy.array(output)
+
+    with open('data.pickle' , 'wb') as f:
+        pickle.dump((words , lables , training , output) , f)
 
