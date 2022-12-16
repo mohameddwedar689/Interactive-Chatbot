@@ -16,7 +16,7 @@
         },
         {"tag": "name",
          "patterns": ["what is your name", "what should I call you", "whats your name?", "who are you?"],
-         "responses": ["You can call me Sally.", "I'm Sally!", "I'm Sally."],
+         "responses": ["You can call me MO.", "I'm MO!", "I'm MO."],
          "context_set": ""
         },
         {"tag": "help",

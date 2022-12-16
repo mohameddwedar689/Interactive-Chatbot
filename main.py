@@ -95,3 +95,64 @@ except:
     with open('data.pickle' , 'wb') as f:
         pickle.dump((words , lables , training , output) , f)
 
+
+
+# Training Model
+
+net = tflearn.input_data(shape=[None , len(training[0])])
+net = tflearn.fully_connected(net , 8)
+net = tflearn.fully_connected(net , 8)
+net = tflearn.fully_connected(net , len(output[0]) , activation="softmax")
+net = tflearn.regression(net)
+
+# select nueral network
+model = tflearn.DNN(net)
+try:
+    model.load("model.tflearn")
+except:
+    model.fit(training, output, n_epoch=1000, batch_size=8, show_metric=True)
+    model.save("model.tflearn")
+
+
+# Function that convert user statement to bag of words
+def bag_of_words(s, words):
+    bag = [0 for _ in range(len(words))]
+
+    s_words = nltk.word_tokenize(s)
+    s_words = [stemmer.stem(word.lower()) for word in s_words]
+
+    for se in s_words:
+        for i, w in enumerate(words):
+            if w == se:
+                bag[i] = 1
+            
+    return numpy.array(bag)
+
+
+
+# Function that can be interact with the model
+def chat():
+    print("Hi, How can i help you ?")
+    while True:
+        inp = input("You: ")
+        if inp.lower() == "quit":
+            break
+
+        results = model.predict([bag_of_words(inp, words)])[0]
+        results_index = numpy.argmax(results)
+        tag = lables[results_index]
+        if results[results_index] > 0.8:
+            for tg in data["intents"]:
+                if tg['tag'] == tag:
+                    responses = tg['responses']
+            sleep(3)
+            Bot = random.choice(responses)
+            print(Bot)
+        else:
+            print("I don't understand!")
+chat()
+    
+
+
+
+
