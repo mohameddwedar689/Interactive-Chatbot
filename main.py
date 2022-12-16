@@ -2,6 +2,7 @@
 import nltk
 nltk.download('punkt')
 from nltk.stem.lancaster import LancasterStemmer
+stemmer = LancasterStemmer()
 import numpy
 import tensorflow as tf
 import tflearn
@@ -38,6 +39,55 @@ for intent in data['intents']:
         lables.append(intent['tag'])
 
 
+# Stemming data form words list
+words = [stemmer.stem(w.lower()) for w in words if w != '?']
+# for overfeding purposes
+words = sorted(list(set(words)))
+lables = sorted(lables)
+
+
+
+#print(words)
+#print(lables)
+
+
+# Create training list
+training = []
+output = []
+
+out_empty = [0 for _ in range(len(lables))]
+
+#print(out_empty)
+
+
+for x , doc in enumerate(docs_x):
+    bag = []
+
+    wrds = [stemmer.stem(w) for w  in doc]
+
+    #print(wrds)
+
+    for w in words:
+        if w in wrds:
+            bag.append(1)
+        else:
+            bag.append(0)
+
+
+    #print(bag)
+
+    output_row = out_empty[:]
+    output_row[lables.index(docs_y[x])] = 1
+
+    training.append(bag)
+    output.append(output_row)
+
+#print(training)
+#print(output)
+ 
+# convert it to numpy array 
+training = numpy.array(training)
+output = numpy.array(output)
 
 
 
